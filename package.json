@@ -1,0 +1,44 @@
+{
+  "name": "pwtrace",
+  "version": "0.1.0",
+  "description": "Extract and analyze Playwright trace files from the command line",
+  "main": "lib/trace.js",
+  "bin": {
+    "pwtrace": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "mocha test/**/*.test.js",
+    "format": "prettier --write .",
+    "prepublishOnly": "npm test",
+    "audit": "npm audit --production || true"
+  },
+  "keywords": [
+    "playwright",
+    "trace",
+    "debugging",
+    "testing",
+    "cli",
+    "e2e"
+  ],
+  "author": "Nathan Long <hello@nathanmlong.com> (https://github.com/nathanl)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanl/pwtrace.git"
+  },
+  "homepage": "https://github.com/nathanl/pwtrace",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "adm-zip": "0.5.16",
+    "commander": "11.0.0"
+  },
+  "devDependencies": {
+    "chai": "6.2.2",
+    "mocha": "11.7.5",
+    "playwright": "1.57.0",
+    "prettier": "3.7.4"
+  }
+}

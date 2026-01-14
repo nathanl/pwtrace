@@ -1,0 +1,15 @@
+# Test files and fixtures
+test/
+*.test.js
+
+# Development files
+.github/
+.vscode/
+.prettierrc*
+.prettierignore
+.gitignore
+.git/
+
+# Documentation that's not needed in package
+CONTRIBUTING.md
+.DS_Store
