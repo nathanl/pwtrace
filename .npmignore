@@ -1,6 +1,8 @@
 # Test files and fixtures
 test/
 *.test.js
+test_output/
+trace_screenshots/
 
 # Development files
 .github/

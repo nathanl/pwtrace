@@ -1,3 +1,7 @@
 node_modules/
 *.log
 .DS_Store
+
+# Test output directories
+test_output/
+trace_screenshots/
