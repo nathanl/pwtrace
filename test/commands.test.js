@@ -234,6 +234,7 @@ describe("CLI Commands", () => {
 
   describe("screenshot", () => {
     const outputDir = path.join(__dirname, "tmp");
+    const EXAMPLE_TRACE = path.join(__dirname, "fixtures", "example_com.zip");
 
     beforeEach(() => {
       if (!fs.existsSync(outputDir)) {
@@ -247,47 +248,133 @@ describe("CLI Commands", () => {
       }
     });
 
-    it("should extract screenshot by step", () => {
+    it("should list screenshots for a step", () => {
       const result = runCommand(
-        `node bin/cli.js screenshot ${PASSING_TRACE} --step 2 --output ${outputDir}`,
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --list`,
       );
 
-      expect(result.stdout).to.include("Extracted:");
-      expect(result.stdout).to.include("step-2.jpeg");
+      expect(result.exitCode).to.equal(0);
+      expect(result.stdout).to.include("Step 2:");
+      expect(result.stdout).to.include("Timing:");
+      expect(result.stdout).to.include("Available screenshots");
+      expect(result.stdout).to.include("[1]");
+      expect(result.stdout).to.include("To extract a specific screenshot:");
+    });
 
-      const screenshotPath = path.join(outputDir, "step-2.jpeg");
+    it("should list screenshots in JSON format", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --list --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const json = JSON.parse(result.stdout);
+      expect(json).to.have.property("step");
+      expect(json).to.have.property("method");
+      expect(json).to.have.property("startTime");
+      expect(json).to.have.property("endTime");
+      expect(json).to.have.property("duration");
+      expect(json).to.have.property("screenshots");
+      expect(json.screenshots).to.be.an("array");
+      expect(json.step).to.equal(2);
+
+      // Check screenshot object structure
+      if (json.screenshots.length > 0) {
+        const screenshot = json.screenshots[0];
+        expect(screenshot).to.have.property("index");
+        expect(screenshot).to.have.property("timestamp");
+        expect(screenshot).to.have.property("position");
+        expect(screenshot).to.have.property("relativeToStart");
+        expect(screenshot).to.have.property("relativeToEnd");
+        expect(screenshot).to.have.property("sizeKB");
+        expect(screenshot).to.have.property("dimensions");
+        expect(screenshot.position).to.be.oneOf(["before", "during", "after"]);
+      }
+    });
+
+    it("should extract screenshot by step and index", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --index 2 --output ${outputDir}`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      expect(result.stdout).to.include("Extracted:");
+      expect(result.stdout).to.include("step-2-screenshot-2.jpeg");
+
+      const screenshotPath = path.join(outputDir, "step-2-screenshot-2.jpeg");
       expect(fs.existsSync(screenshotPath)).to.be.true;
     });
 
-    it("should extract screenshot at failure", () => {
+    it("should require --step option", () => {
       const result = runCommand(
-        `node bin/cli.js screenshot ${FAILING_TRACE} --failure --output ${outputDir}`,
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --list`,
       );
 
-      expect(result.stdout).to.include("Extracted:");
-      expect(result.stdout).to.include("failure.jpeg");
-
-      const screenshotPath = path.join(outputDir, "failure.jpeg");
-      expect(fs.existsSync(screenshotPath)).to.be.true;
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include(
+        "required option '--step <number>' not specified",
+      );
     });
 
-    it("should require --step or --failure", () => {
+    it("should require either --list or --index", () => {
       const result = runCommand(
-        `node bin/cli.js screenshot ${PASSING_TRACE} --output ${outputDir}`,
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2`,
       );
 
-      expect(result.stdout).to.include("Must specify");
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include("Must specify either --list or --index");
+    });
+
+    it("should not allow both --list and --index", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --list --index 1`,
+      );
+
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include(
+        "Cannot use --list and --index together",
+      );
+    });
+
+    it("should validate index range", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --index 999`,
+      );
+
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include("Invalid index");
+      expect(result.stderr).to.include("Valid range:");
+    });
+
+    it("should require --index for --base64", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --base64`,
+      );
+
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include(
+        "--base64 and --binary can only be used with --index",
+      );
     });
 
     it("should output base64 data URI with --base64 flag", () => {
       const result = runCommand(
-        `node bin/cli.js screenshot ${PASSING_TRACE} --step 2 --base64 2>&1`,
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 2 --index 2 --base64 2>&1`,
       );
 
+      expect(result.exitCode).to.equal(0);
       const lines = result.stdout.split("\n");
       expect(lines[0]).to.match(/^data:image\/jpeg;base64,/);
       expect(result.stdout).to.include("Image dimensions:");
       expect(result.stdout).to.include("Image size:");
+    });
+
+    it("should handle invalid step number", () => {
+      const result = runCommand(
+        `node bin/cli.js screenshot ${EXAMPLE_TRACE} --step 999 --list`,
+      );
+
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include("not found");
     });
   });
 

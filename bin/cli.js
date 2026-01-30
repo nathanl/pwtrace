@@ -216,13 +216,13 @@ program
 program
   .command("screenshot <tracefile>")
   .description("Extract screenshot from trace to JPEG file")
+  .requiredOption("--step <number>", "Step number (required)")
+  .option("--list", "List available screenshots with timing info")
+  .option("--index <number>", "Extract specific screenshot by index")
   .option(
-    "--step <number>",
-    "Extract screenshot at specific step (saves as step-N.jpeg)",
-  )
-  .option(
-    "--failure",
-    "Extract screenshot at failure point (saves as failure.jpeg)",
+    "--format <format>",
+    "Output format for --list: text, json (default: text)",
+    "text",
   )
   .option("--output <dir>", "Output directory (default: current directory)")
   .option("--base64", "Output base64-encoded image data instead of saving file")
@@ -230,27 +230,33 @@ program
   .addHelpText(
     "after",
     `
+ WORKFLOW:
+   1. List available screenshots for a step
+   2. Choose which screenshot to extract by index
+ 
  EXAMPLES:
-   pwtrace screenshot trace.zip --step 4
-   pwtrace screenshot trace.zip --failure
-   pwtrace screenshot trace.zip --step 4 --output ./debug/
-   pwtrace screenshot trace.zip --step 4 --base64
-   pwtrace screenshot trace.zip --step 4 --binary > output.jpg
+   # List available screenshots for step 2
+   pwtrace screenshot trace.zip --step 2 --list
+   
+   # List in JSON format
+   pwtrace screenshot trace.zip --step 2 --list --format json
+   
+   # Extract specific screenshot by index
+   pwtrace screenshot trace.zip --step 2 --index 2
+   
+   # Extract as base64 (useful for LLMs)
+   pwtrace screenshot trace.zip --step 2 --index 2 --base64
+   
+   # Extract as binary (for piping)
+   pwtrace screenshot trace.zip --step 2 --index 2 --binary > output.jpg
  
  OUTPUT FILES:
-   --step 4        saves as: step-4.jpeg
-   --failure       saves as: failure.jpeg
+   --step 2 --index 5  saves as: step-2-screenshot-5.jpeg
  
-  BASE64 OUTPUT:
-    --base64        Outputs base64-encoded data URI to stdout (useful for LLMs)
-                    Image metadata (dimensions, size) written to stderr
- 
-  BINARY OUTPUT:
-    --binary        Outputs raw binary image data to stdout (for piping to file)
-                    Usage: pwtrace screenshot trace.zip --step 4 --binary > foo.jpg
- 
- NOTE:
-   Requires either --step or --failure (not both)
+ NOTES:
+   - Must specify either --list or --index (not both)
+   - --base64 and --binary only work with --index
+   - Use --list first to see available screenshots and their timing
 `,
   )
   .action(screenshotCommand);
