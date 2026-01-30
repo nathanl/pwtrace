@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-30
+
 ### Added
 
 - `dom` command: New `--action` flag to show DOM snapshot during the action (the `input@` snapshot), matching the "Action" tab in Playwright Trace Viewer GUI
@@ -45,5 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security features: zip validation, redaction of sensitive headers, output sanitization
 - Environment variables for tuning safety limits
 
-[Unreleased]: https://github.com/yourusername/pwtrace/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/pwtrace/releases/tag/v0.1.0
+[Unreleased]: https://github.com/nathanl/pwtrace/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/nathanl/pwtrace/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/nathanl/pwtrace/releases/tag/v0.1.0

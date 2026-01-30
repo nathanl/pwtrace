@@ -1,6 +1,6 @@
 {
   "name": "pwtrace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Extract and analyze Playwright trace files from the command line",
   "main": "lib/trace.js",
   "bin": {
