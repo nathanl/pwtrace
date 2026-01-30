@@ -7,21 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- **BREAKING**: `screenshot` command now requires either `--list` or `--index <N>` flag instead of automatically selecting a screenshot. This removes heuristic-based screenshot selection in favor of transparent information exposure.
-- `screenshot` command: `--step` is now required (was optional when using `--failure`)
-
-### Removed
-
-- **BREAKING**: `screenshot` command: Removed `--failure` flag. Users should use `--list` to see available screenshots and choose based on timing.
-
 ### Added
 
+- `dom` command: New `--action` flag to show DOM snapshot during the action (the `input@` snapshot), matching the "Action" tab in Playwright Trace Viewer GUI
+- `dom` command: Transparency warnings when snapshot fallback occurs (e.g., "Note: before@ snapshot was empty, showing action@ snapshot instead")
+- `dom` command: JSON output now includes `fallbackUsed` and `fallbackType` fields to indicate when fallback occurred
 - `screenshot` command: New `--list` flag shows all available screenshots for a step with detailed timing information (absolute timestamp, relative timing, position, size, dimensions)
 - `screenshot` command: New `--index <N>` flag extracts a specific screenshot by its index number
 - `screenshot` command: New `--format` flag for `--list` mode supports `text` (default) and `json` output
 - `screenshot` command: Extracted screenshots now use format `step-N-screenshot-M.jpeg` (e.g., `step-2-screenshot-5.jpeg`)
+
+### Changed
+
+- **BREAKING**: `screenshot` command now requires either `--list` or `--index <N>` flag instead of automatically selecting a screenshot. This removes heuristic-based screenshot selection in favor of transparent information exposure.
+- **BREAKING**: `screenshot` command: `--step` is now required (was optional when using `--failure`)
+- `dom` command: `--action` and `--after` are mutually exclusive
+- `dom` command: Improved fallback behavior to prefer action@ snapshot when before@ or after@ snapshots are empty
+
+### Removed
+
+- **BREAKING**: `screenshot` command: Removed `--failure` flag. Users should use `--list` to see available screenshots and choose based on timing.
 
 ## [0.1.0] - 2025-01-30
 

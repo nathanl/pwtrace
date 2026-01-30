@@ -170,7 +170,8 @@ program
     "Show DOM state at a specific step (useful for debugging element issues)",
   )
   .requiredOption("--step <number>", "Step number to show DOM for")
-  .option("--after", "Show DOM after the action (default: before)")
+  .option("--action", "Show DOM during the action (matches GUI 'Action' tab)")
+  .option("--after", "Show DOM after the action completes")
   .option(
     "--interactive",
     "Show only interactive elements (buttons, inputs, links, etc.)",
@@ -184,12 +185,21 @@ program
   .addHelpText(
     "after",
     `
+ SNAPSHOT TIMING:
+   (default)  Before action starts (matches GUI 'Before' tab)
+   --action   During the action (matches GUI 'Action' tab)
+   --after    After action completes (matches GUI 'After' tab)
+   
+   These match the three tabs in the Playwright Trace Viewer.
+   Note: --action and --after are mutually exclusive.
+
  EXAMPLES:
    pwtrace dom trace.zip --step 4
+   pwtrace dom trace.zip --step 4 --action
+   pwtrace dom trace.zip --step 4 --after
    pwtrace dom trace.zip --step 4 --interactive
    pwtrace dom trace.zip --step 4 --selector button
    pwtrace dom trace.zip --step 4 --selector "#submit-btn"
-   pwtrace dom trace.zip --step 4 --after
    pwtrace dom trace.zip --step 4 --raw
  
  OUTPUT:
@@ -208,6 +218,7 @@ program
    Element not found?     Use --interactive to see what's clickable
    Wrong selector?        Use --selector to test if element exists
    State changed?         Compare --step N vs --step N --after
+   Page navigated?        Use --action to see DOM during navigation
    Need raw HTML?         Use --raw for unprocessed DOM
 `,
   )

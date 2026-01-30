@@ -181,7 +181,26 @@ Output:
 
 Query the DOM at any step, especially useful for failed steps.
 
+**DOM Snapshot Timing:**
+
+Playwright captures DOM snapshots at three points during each action:
+
+- **Before** - DOM state before the action starts (default)
+- **Action** - DOM state during the action (corresponds to Playwright Trace Viewer's "Action" tab)
+- **After** - DOM state after the action completes
+
+These match the three tabs in the official Playwright Trace Viewer GUI.
+
 ```bash
+# Show DOM before action (default)
+pwtrace dom trace.zip --step 4
+
+# Show DOM during action
+pwtrace dom trace.zip --step 4 --action
+
+# Show DOM after action completes
+pwtrace dom trace.zip --step 4 --after
+
 # Show interactive elements at a specific step
 pwtrace dom trace.zip --step 4 --interactive
 
@@ -190,12 +209,6 @@ pwtrace dom trace.zip --step 4 --selector button
 
 # Check if a specific ID exists
 pwtrace dom trace.zip --step 4 --selector "#submit-btn"
-
-# Show full DOM structure
-pwtrace dom trace.zip --step 4
-
-# Show DOM after the action
-pwtrace dom trace.zip --step 4 --after
 
 # Show raw unprocessed DOM
 pwtrace dom trace.zip --step 4 --raw
@@ -230,13 +243,14 @@ URL: https://github.com/
 **Options:**
 
 - `--step <number>` - **Required.** Step number to show DOM for
-- `--after` - Show DOM after the action (default: before)
+- `--action` - Show DOM during the action (matches Playwright GUI "Action" tab)
+- `--after` - Show DOM after the action completes
 - `--interactive` - Show only interactive elements (buttons, inputs, links, etc.)
 - `--selector <selector>` - Filter elements by CSS selector (tag, #id, .class)
 - `--raw` - Show full DOM without simplification
 - `--format <format>` - Output format: `text`, `json` (default: `text`)
 
-**Note:** DOM snapshots use Playwright's compression format. The tool finds the closest full snapshot (before or after as requested) and renders either simplified interactive elements or the raw HTML. "Interactive" includes buttons, inputs, anchors with href/role, and common clickable roles.
+**Note:** The `--action` and `--after` flags are mutually exclusive. When a requested snapshot is empty, the tool automatically falls back to the nearest available snapshot and displays a note. "Interactive" includes buttons, inputs, anchors with href/role, and common clickable roles.
 
 ### `screenshot <tracefile>` - Extract screenshots
 

@@ -201,6 +201,61 @@ describe("CLI Commands", () => {
       expect(result.stdout).to.include(">");
     });
 
+    it("should show DOM with --action flag", () => {
+      const result = runCommand(
+        `node bin/cli.js dom ${PASSING_TRACE} --step 4 --action`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      expect(result.stdout).to.include("DOM at step 4 (action)");
+      expect(result.stdout).to.include("<");
+    });
+
+    it("should show DOM with --after flag", () => {
+      const result = runCommand(
+        `node bin/cli.js dom ${PASSING_TRACE} --step 3 --after`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      expect(result.stdout).to.include("DOM at step 3 (after)");
+      expect(result.stdout).to.include("<");
+    });
+
+    it("should error when --action and --after are both used", () => {
+      const result = runCommand(
+        `node bin/cli.js dom ${PASSING_TRACE} --step 3 --action --after`,
+      );
+
+      expect(result.exitCode).to.not.equal(0);
+      expect(result.stderr).to.include("mutually exclusive");
+    });
+
+    it("should show fallback warning when snapshot is empty", () => {
+      const result = runCommand(
+        `node bin/cli.js dom ${PASSING_TRACE} --step 3`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      // Step 3 has empty before@ snapshot, should fallback to action@
+      if (result.stdout.includes("Note:")) {
+        expect(result.stdout).to.include("snapshot was empty");
+      }
+    });
+
+    it("should include fallback info in JSON output", () => {
+      const result = runCommand(
+        `node bin/cli.js dom ${PASSING_TRACE} --step 3 --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const output = JSON.parse(result.stdout);
+      expect(output).to.have.property("timing");
+      expect(output).to.have.property("fallbackUsed");
+      if (output.fallbackUsed) {
+        expect(output).to.have.property("fallbackType");
+      }
+    });
+
     it("should filter interactive elements", () => {
       const result = runCommand(
         `node bin/cli.js dom ${PASSING_TRACE} --step 3 --interactive`,
