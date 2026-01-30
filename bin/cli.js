@@ -38,7 +38,8 @@ program
    2. Inspect failure:   pwtrace step trace.zip 4
    3. Check DOM state:   pwtrace dom trace.zip --step 4 --interactive
    4. View console:      pwtrace console trace.zip --step 4 --level error
-   5. Get screenshot:    pwtrace screenshot trace.zip --failure
+   5. List screenshots:  pwtrace screenshot trace.zip --step 4 --list
+   6. Get screenshot:    pwtrace screenshot trace.zip --step 4 --index 2
 
  COMMON PATTERNS:
    Quick diagnosis:      pwtrace trace.zip
