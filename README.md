@@ -240,28 +240,79 @@ URL: https://github.com/
 
 ### `screenshot <tracefile>` - Extract screenshots
 
+Playwright trace files contain multiple JPEG screenshots (screencast frames) captured at various times. This command helps you explore what screenshots are available and extract the ones you need.
+
+**Two-step workflow:**
+
+1. **List available screenshots** - See all screenshots for a step with detailed timing information
+2. **Extract by index** - Choose which screenshot to extract based on the timing data
+
 ```bash
-# Extract screenshot at specific step (saves as step-4.jpeg in current directory)
-pwtrace screenshot trace.zip --step 4
+# Step 1: List all screenshots for a step
+pwtrace screenshot trace.zip --step 4 --list
 
-# Extract screenshot at failure point (saves as failure.jpeg in current directory)
-pwtrace screenshot trace.zip --failure
+# Output shows:
+# Screenshot 3: 1234567890123ms (0.52s after step start, during action)
+#   Size: 45.2 KB, Dimensions: 1280x720, Position: during
 
-# Save to specific directory
-pwtrace screenshot trace.zip --step 4 --output ./debug/
+# Step 2: Extract the screenshot you want by index
+pwtrace screenshot trace.zip --step 4 --index 3
 
 # Output as base64 data URI for inline viewing (useful for LLMs)
-pwtrace screenshot trace.zip --step 4 --base64
+pwtrace screenshot trace.zip --step 4 --index 3 --base64
+
+# Save to specific directory
+pwtrace screenshot trace.zip --step 4 --index 3 --output ./debug/
+
+# Get list as JSON for programmatic use
+pwtrace screenshot trace.zip --step 4 --list --format json
 ```
 
 **Options:**
 
-- `--step <number>` - Extract screenshot at specific step (saves as `step-N.jpeg`)
-- `--failure` - Extract screenshot at failure point (saves as `failure.jpeg`)
-- `--output <dir>` - Output directory (default: current directory)
+- `--step <number>` - **Required.** Step number to work with
+- `--list` - List all available screenshots with timing info (mutually exclusive with `--index`)
+- `--index <number>` - Extract specific screenshot by index (mutually exclusive with `--list`)
+- `--output <dir>` - Output directory for extracted screenshots (default: current directory)
 - `--base64` - Output base64-encoded data URI instead of saving file
+- `--format <format>` - Format for `--list` mode: `text`, `json` (default: `text`)
 
-**Screenshot validation:** The tool automatically checks image dimensions and file size, warning if screenshots appear invalid (e.g., <10px dimensions, <5KB file size).
+**Why this approach?**
+
+Screenshots are captured asynchronously and may not align perfectly with action boundaries. During page navigations, multiple screenshots might capture loading states. Rather than guessing which screenshot is "correct," this tool shows you ALL screenshots with their precise timing, allowing you to make an informed choice.
+
+Each screenshot shows:
+
+- **Index** - Use this with `--index` to extract
+- **Absolute timestamp** - When the screenshot was captured
+- **Relative timing** - Time before/after step start and end
+- **Position** - Whether it was captured before/during/after the action
+- **Size and dimensions** - File size and image dimensions
+
+**Example output:**
+
+```
+Available screenshots for step 4 (click):
+Action: 1.234s - 1.456s (duration: 0.222s)
+──────────────────────────────────────────────────────────────
+
+Screenshot 2: 1234500000000ms
+  0.12s before step start, 0.34s before action end
+  Size: 42.1 KB, Dimensions: 1280x720
+  Position: before
+
+Screenshot 3: 1234567000000ms
+  0.05s after step start, during action
+  Size: 45.2 KB, Dimensions: 1280x720
+  Position: during
+
+Screenshot 4: 1234600000000ms
+  0.14s after step end
+  Size: 44.8 KB, Dimensions: 1280x720
+  Position: after
+
+To extract a screenshot, use: pwtrace screenshot trace.zip --step 4 --index <N>
+```
 
 ### `network <tracefile>` - Network requests
 
