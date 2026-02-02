@@ -74,12 +74,16 @@ program
  OUTPUT:
    Duration: 2.3s | Actions: 4 | Result: FAILED
    
-    # | Status | Action | Target          | Duration | Error
-   ─────────────────────────────────────────────────────────────────────
-    1 | ✓      | goto   | /users/login    | 209ms    |
-    2 | ✓      | fill   | "Email Address" | 21ms     |
-    3 | ✓      | fill   | "Password"      | 18ms     |
-    4 | ✗      | click  | "Sign In"       | 5000ms   | Timeout waiting...
+    # | Status | Action | Target          | Duration | Source         | Error
+   ─────────────────────────────────────────────────────────────────────────────────────
+    1 | ✓      | goto   | /users/login    | 209ms    | (Not captured) |
+    2 | ✓      | fill   | "Email Address" | 21ms     | (Not captured) |
+    3 | ✓      | fill   | "Password"      | 18ms     | (Not captured) |
+    4 | ✗      | click  | "Sign In"       | 5000ms   | (Not captured) | Timeout waiting...
+ 
+ NOTES:
+   - "Source" column shows test source file:line when available in trace
+   - Shows "(Not captured)" when source info is not available
 `,
   )
   .action(showCommand);
@@ -122,6 +126,8 @@ program
  
  OUTPUT:
    Step 4: click
+   Test Step: Click non-existent button
+   Source: /path/to/test/homepage_test.ts:25
    Status:   FAILED (timeout)
    Duration: 5.0s
    Selector: button:has-text("Sign In")
@@ -134,6 +140,9 @@ program
  
  TIP:
    Use 'pwtrace show' to see all step numbers, then drill into specific steps
+ 
+ NOTES:
+   - Source shows full file path when available, or "(Not captured)" if not
 `,
   )
   .action(stepCommand);

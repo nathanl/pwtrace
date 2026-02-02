@@ -108,6 +108,53 @@ describe("CLI Commands", () => {
       expect(childOfNestedGroup).to.exist;
       expect(childOfNestedGroup.nesting_depth).to.equal(2);
     });
+
+    it("should show Source column in table output", () => {
+      const result = runCommand(`node bin/cli.js show ${NESTED_GROUPS_TRACE}`);
+
+      expect(result.stdout).to.include("Source");
+      expect(result.stdout).to.include("e2e_helpers.ex:14");
+      expect(result.stdout).to.include("folders_test.exs:99");
+      expect(result.stdout).to.include("folders_test.exs:103");
+    });
+
+    it("should show Source column even when trace has no source info", () => {
+      const result = runCommand(`node bin/cli.js show ${FAILING_TRACE}`);
+
+      expect(result.stdout).to.include("Source");
+      expect(result.stdout).to.include("(Not captured)");
+    });
+
+    it("should include source in JSON output when available", () => {
+      const result = runCommand(
+        `node bin/cli.js show ${NESTED_GROUPS_TRACE} --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const json = JSON.parse(result.stdout);
+
+      const actionWithSource = json.actions.find((a) => a.source !== null);
+      expect(actionWithSource).to.exist;
+      expect(actionWithSource.source).to.have.property("file");
+      expect(actionWithSource.source).to.have.property("line");
+      expect(actionWithSource.source).to.have.property("column");
+      expect(actionWithSource.source.file).to.include("e2e_helpers.ex");
+      expect(actionWithSource.source.line).to.equal(14);
+    });
+
+    it("should have null source in JSON output when not available", () => {
+      const result = runCommand(
+        `node bin/cli.js show ${FAILING_TRACE} --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const json = JSON.parse(result.stdout);
+
+      json.actions.forEach((action) => {
+        expect(action).to.have.property("source");
+        expect(action.source).to.be.null;
+      });
+    });
   });
 
   describe("summary", () => {
@@ -164,6 +211,50 @@ describe("CLI Commands", () => {
       expect(json).to.have.property("status");
       expect(json).to.have.property("duration_ms");
       expect(json.step).to.equal(2);
+    });
+
+    it("should show source location in text output when available", () => {
+      const result = runCommand(
+        `node bin/cli.js step ${NESTED_GROUPS_TRACE} 10`,
+      );
+
+      expect(result.stdout).to.include("Source:");
+      expect(result.stdout).to.include("folders_test.exs:99");
+      expect(result.stdout).to.match(/Source:.*folders_test\.exs:99/);
+    });
+
+    it("should show '(Not captured)' when source not available", () => {
+      const result = runCommand(`node bin/cli.js step ${FAILING_TRACE} 2`);
+
+      expect(result.stdout).to.include("Source:");
+      expect(result.stdout).to.include("(Not captured)");
+    });
+
+    it("should include source in JSON output when available", () => {
+      const result = runCommand(
+        `node bin/cli.js step ${NESTED_GROUPS_TRACE} 2 --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const json = JSON.parse(result.stdout);
+      expect(json).to.have.property("source");
+      expect(json.source).to.not.be.null;
+      expect(json.source).to.have.property("file");
+      expect(json.source).to.have.property("line");
+      expect(json.source).to.have.property("column");
+      expect(json.source.file).to.include("e2e_helpers.ex");
+      expect(json.source.line).to.equal(14);
+    });
+
+    it("should have null source in JSON output when not available", () => {
+      const result = runCommand(
+        `node bin/cli.js step ${FAILING_TRACE} 2 --format json`,
+      );
+
+      expect(result.exitCode).to.equal(0);
+      const json = JSON.parse(result.stdout);
+      expect(json).to.have.property("source");
+      expect(json.source).to.be.null;
     });
   });
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- In `show` command, new "Source" column displays source file location (file:line) from test step annotations when available
+- In `step` command, source file location now displayed in detail view when available (full path)
+- JSON output: `source` field added to action objects in both `show` and `step` commands, containing `file`, `line`, and `column` properties
+
 ## [0.2.0] - 2026-01-30
 
 ### Added

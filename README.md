@@ -66,35 +66,37 @@ Output:
 ```
 Duration: 2.3s | Actions: 4 | Result: FAILED
 
- # | Status | Action | Target          | Duration | Error
-─────────────────────────────────────────────────────────────────────────────────
- 1 | ✓      | goto   | /users/login    | 209ms    |
- 2 | ✓      | fill   | "Email Address" | 21ms     |
- 3 | ✓      | fill   | "Password"      | 18ms     |
- 4 | ✗      | click  | "Sign In"       | 5000ms   | Timeout waiting for selector
+ # | Status | Action | Target          | Duration | Source         | Error
+────────────────────────────────────────────────────────────────────────────────────────
+ 1 | ✓      | goto   | /users/login    | 209ms    | (Not captured) |
+ 2 | ✓      | fill   | "Email Address" | 21ms     | (Not captured) |
+ 3 | ✓      | fill   | "Password"      | 18ms     | (Not captured) |
+ 4 | ✗      | click  | "Sign In"       | 5000ms   | (Not captured) | Timeout waiting for selector
 ```
 
 #### Test Step Support
 
 When your tests include step metadata using `tracingGroup`, an additional "Test Step" column appears automatically, grouping related actions. Steps are 1-indexed. Actions include user operations (click, fill, goto) and selected internal events (e.g., evaluateExpression) as recorded by the Playwright trace.
 
+When test steps include source location annotations (stack traces), the "Source" column displays the originating file and line number in your test code (e.g., `folders_test.exs:99`). The Source column is always present; when source annotations are not captured in the trace, it displays "(Not captured)" to indicate the feature is available.
+
 ```
 Duration: 3.9s | Actions: 12 | Result: FAILED
 
- #  | Status | Action             | Target                | Duration | Test Step                         | Error
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
- 1  | ✓      | newPage            |                       | 52ms     |                                   |
- 2  | ✓      | goto               | https://example.com   | 143ms    |                                   |
- 3  | ✓      | evaluateExpression |                       | 2ms      | Setup - Navigate to homepage      |
- 4  | ✓      | waitForTimeout     |                       | 301ms    | Setup - Navigate to homepage      |
- 5  | ✓      | evaluateExpression |                       | 1ms      | Find and click documentation link |
- 6  | ✓      | click              | a[href*="iana"]       | 532ms    | Find and click documentation link |
- 7  | ✓      | waitForTimeout     |                       | 500ms    | Find and click documentation link |
- 8  | ✓      | evaluateExpression |                       | 2ms      | Verify header text                |
- 9  | ✓      | click              | h1                    | 23ms     | Verify header text                |
- 10 | ✓      | waitForTimeout     |                       | 301ms    | Verify header text                |
- 11 | ✓      | evaluateExpression |                       | 1ms      | Click non-existent button         |
- 12 | ✗      | click              | button#does-not-exist | 2.0s     | Click non-existent button         | Timeout 2000ms exceeded.
+ #  | Status | Action             | Target                | Duration | Test Step                         | Source            | Error
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 1  | ✓      | newPage            |                       | 52ms     |                                   |                   |
+ 2  | ✓      | goto               | https://example.com   | 143ms    |                                   |                   |
+ 3  | ✓      | evaluateExpression |                       | 2ms      | Setup - Navigate to homepage      | homepage_test.ts:10 |
+ 4  | ✓      | waitForTimeout     |                       | 301ms    | Setup - Navigate to homepage      | homepage_test.ts:10 |
+ 5  | ✓      | evaluateExpression |                       | 1ms      | Find and click documentation link | homepage_test.ts:15 |
+ 6  | ✓      | click              | a[href*="iana"]       | 532ms    | Find and click documentation link | homepage_test.ts:15 |
+ 7  | ✓      | waitForTimeout     |                       | 500ms    | Find and click documentation link | homepage_test.ts:15 |
+ 8  | ✓      | evaluateExpression |                       | 2ms      | Verify header text                | homepage_test.ts:20 |
+ 9  | ✓      | click              | h1                    | 23ms     | Verify header text                | homepage_test.ts:20 |
+ 10 | ✓      | waitForTimeout     |                       | 301ms    | Verify header text                | homepage_test.ts:20 |
+ 11 | ✓      | evaluateExpression |                       | 1ms      | Click non-existent button         | homepage_test.ts:25 |
+ 12 | ✗      | click              | button#does-not-exist | 2.0s     | Click non-existent button         | homepage_test.ts:25 | Timeout 2000ms exceeded.
 ```
 
 Nested tracing groups are indented:
@@ -123,6 +125,7 @@ Output:
 ```
 Step 4: click
 Test Step: Click non-existent button
+Source: /path/to/test/homepage_test.ts:25
 ════════════════════════════════════════════════════════════════
 Status:   FAILED (timeout)
 Duration: 5.0s
@@ -135,7 +138,7 @@ Console Errors (around this step):
   [error] Cannot read property 'id' of undefined
 ```
 
-**Note:** Test Step context is shown when available (from `tracingGroup` annotations).
+**Note:** Test Step context is shown when available (from `tracingGroup` annotations). Source displays the full file path when source annotations are present in the trace.
 
 ### `summary <tracefile>` - Quick stats
 
