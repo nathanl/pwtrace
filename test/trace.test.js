@@ -31,6 +31,8 @@ describe("Trace", () => {
 
       expect(trace.metadata).to.be.an("object");
       expect(trace.metadata.browserName).to.equal("chromium");
+      expect(trace.metadata.wallTime).to.be.a("number");
+      expect(trace.metadata.monotonicTime).to.be.a("number");
     });
   });
 
@@ -77,6 +79,31 @@ describe("Trace", () => {
         expect(action.duration).to.be.greaterThan(0);
         expect(action.duration).to.equal(action.endTime - action.startTime);
       });
+    });
+  });
+
+  describe("getTotalDuration()", () => {
+    it("should calculate total duration as span from first start to last end", () => {
+      const trace = new Trace(PASSING_TRACE);
+      trace.load();
+
+      const totalDuration = trace.getTotalDuration();
+      expect(totalDuration).to.be.a("number");
+      expect(totalDuration).to.be.greaterThan(0);
+
+      // Total duration should be max(endTime) - min(startTime)
+      const minStart = Math.min(...trace.actions.map((a) => a.startTime));
+      const maxEnd = Math.max(...trace.actions.map((a) => a.endTime));
+      expect(totalDuration).to.equal(maxEnd - minStart);
+    });
+
+    it("should return 0 for empty trace", () => {
+      const trace = new Trace(PASSING_TRACE);
+      trace.load();
+      trace.actions = []; // Empty the actions
+
+      const totalDuration = trace.getTotalDuration();
+      expect(totalDuration).to.equal(0);
     });
   });
 

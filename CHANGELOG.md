@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In `show` command, new "Source" column displays source file location (file:line) from test step annotations when available
 - In `step` command, source file location now displayed in detail view when available (full path)
 - JSON output: `source` field added to action objects in both `show` and `step` commands, containing `file`, `line`, and `column` properties
+- New `getTotalDuration()` method on Trace class to calculate total trace duration without double-counting nested actions
+- Metadata now includes `monotonicTime` from trace context
+- DEVELOPING.md with development workflow, testing, formatting, and publishing instructions
+
+### Fixed
+
+- Screenshot timing calculations now correctly convert wall time to monotonic time, showing accurate relative timestamps (e.g., "37ms after start" instead of huge negative values)
+- Total duration in `show` and `summary` commands now calculated as span from first action start to last action end, preventing double-counting of nested `tracingGroup` actions
+- Status labels in `step` command now only show "(timeout)" for actual timeout errors, not all error types
 
 ## [0.2.0] - 2026-01-30
 
