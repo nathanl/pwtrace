@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-02-18
+
 ### Added
 
 - In `show` command, new "Source" column displays source file location (file:line) from test step annotations when available
@@ -62,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security features: zip validation, redaction of sensitive headers, output sanitization
 - Environment variables for tuning safety limits
 
-[Unreleased]: https://github.com/nathanl/pwtrace/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/nathanl/pwtrace/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/nathanl/pwtrace/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nathanl/pwtrace/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nathanl/pwtrace/releases/tag/v0.1.0
